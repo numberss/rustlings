@@ -16,22 +16,27 @@ fn main() {
             thread::sleep(Duration::from_millis(250));
             println!("Thread {i} done");
             start.elapsed().as_millis()
-        });
+        }).join().unwrap();
         handles.push(handle);
     }
 
-    let mut results = Vec::new();
-    for handle in handles {
-        // TODO: Collect the results of all threads into the `results` vector.
-        // Use the `JoinHandle` struct which is returned by `thread::spawn`.
-    }
+    // dont need this as we are joining in the loop above
+    // not sure if the example does this because its good practice
+    // but i dont know any good practices for threads yet
+    
+    // let mut results = Vec::new();
+    // for handle in handles {
+    //     // TODO: Collect the results of all threads into the `results` vector.
+    //     // Use the `JoinHandle` struct which is returned by `thread::spawn`.
+    //     results.push(handle.join().unwrap());
+    // }
 
-    if results.len() != 10 {
+    if handles.len() != 10 {
         panic!("Oh no! Some thread isn't done yet!");
     }
 
     println!();
-    for (i, result) in results.into_iter().enumerate() {
+    for (i, result) in handles.into_iter().enumerate() {
         println!("Thread {i} took {result}ms");
     }
 }

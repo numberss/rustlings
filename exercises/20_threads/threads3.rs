@@ -17,14 +17,22 @@ impl Queue {
 fn send_tx(q: Queue, tx: mpsc::Sender<u32>) {
     // TODO: We want to send `tx` to both threads. But currently, it is moved
     // into the first thread. How could you solve this problem?
+
+    // ok so cloning works but it seems like a workaround?
+    // if you wanted 8 or 9 senders having 8 or 9 clones seems excessive
+    let tx_clone = tx.clone();
+
     thread::spawn(move || {
         for val in q.first_half {
             println!("Sending {val:?}");
-            tx.send(val).unwrap();
+            tx_clone.send(val).unwrap();
             thread::sleep(Duration::from_millis(250));
         }
     });
-
+    // i can avoid the cloning problem by moving
+    // the two for loops into the same thread
+    // but that also seems like it would be bad
+    // since the threads will panic if one breaks
     thread::spawn(move || {
         for val in q.second_half {
             println!("Sending {val:?}");
